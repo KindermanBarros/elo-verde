@@ -1,3 +1,3 @@
 import type { ReservationIntent } from "./ReservationIntent";
 import type { ReservationStatus } from "./ReservationStatus";
-export interface ReservationIntentRepository { list(): Promise<ReservationIntent[]>; updateStatus(calBookingId: string, status: ReservationStatus, updatedBy: string): Promise<void>; }
+export interface ReservationIntentRepository { list(): Promise<ReservationIntent[]>; updateStatus(reservationId: string, status: ReservationStatus, updatedBy: string): Promise<void>; }

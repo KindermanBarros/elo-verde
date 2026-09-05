@@ -1,2 +1,2 @@
 import type { ReservationStatus } from "./ReservationStatus";
-export type ReservationIntent = { calBookingId: string; status: ReservationStatus; updatedAt: Date; updatedBy: string };
+export type ReservationIntent = { reservationId: string; status: ReservationStatus; updatedAt: Date; updatedBy: string };
