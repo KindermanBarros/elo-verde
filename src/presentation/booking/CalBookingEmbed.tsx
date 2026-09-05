@@ -1,0 +1,2 @@
+"use client";
+export function CalBookingEmbed() { const calLink = process.env.NEXT_PUBLIC_CAL_LINK; if (!calLink) return <div className="rounded-2xl border border-dashed border-stone-400 bg-white p-8 text-stone-600">Configure <code>NEXT_PUBLIC_CAL_LINK</code> para exibir a agenda da Cal.com.</div>; return <iframe title="Agendamento Elo Verde" src={`https://cal.com/${calLink}`} className="h-[720px] w-full rounded-2xl border border-stone-200 bg-white shadow-sm" />; }
