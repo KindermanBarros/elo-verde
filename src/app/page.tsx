@@ -17,10 +17,10 @@ export default function Home() {
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-black/30" />
         <div className="mx-auto grid min-h-[48vh] max-w-6xl content-center gap-8 px-6 py-20 md:grid-cols-[1.35fr_0.65fr] md:px-10">
           <div>
-            <p className="mb-4 text-sm font-semibold tracking-[0.22em] text-emerald-400 uppercase">Chácara Elo Verde</p>
+            <p className="mb-4 text-sm font-semibold tracking-[0.22em] text-white uppercase">Chácara Elo Verde</p>
             <h1 className="max-w-3xl text-5xl font-semibold tracking-tight text-white md:text-7xl">Seu próximo momento de paz começa aqui.</h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-stone-300">Escolha a data da sua diária na chácara. A confirmação e todos os detalhes da reserva são conduzidos pela nossa equipe.</p>
-            <a href="#agendamento" className="mt-8 inline-flex rounded-full bg-emerald-400 px-6 py-3 font-semibold text-emerald-950">Solicitar reserva</a>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-white">Escolha a data da sua diária na chácara. A confirmação e todos os detalhes da reserva são conduzidos pela nossa equipe.</p>
+            <a href="#agendamento" className="mt-8 inline-flex rounded-full bg-emerald-500 px-6 py-3 font-semibold text-white">Solicitar reserva</a>
           </div>
           <aside className="self-end rounded-3xl border border-emerald-400/20 bg-emerald-950/40 p-6">
             <p className="text-sm font-semibold text-emerald-300">Como funciona</p>

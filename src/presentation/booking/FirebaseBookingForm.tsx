@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { reservationStatuses } from "@/domain/reservation/ReservationStatus";
 import { firestore } from "@/infrastructure/firebase/client";
 
 const defaultForm = { name: "", email: "", phone: "", date: "", notes: "" };
@@ -26,7 +25,7 @@ export function FirebaseBookingForm({ initialDate = "" }: Props) {
     try {
       await addDoc(collection(firestore, "reservationIntents"), {
         ...form,
-        status: reservationStatuses[0],
+        status: "Pendente contato",
         updatedBy: "site",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),

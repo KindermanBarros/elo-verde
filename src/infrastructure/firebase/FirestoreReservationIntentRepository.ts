@@ -8,7 +8,7 @@ export class FirestoreReservationIntentRepository implements ReservationIntentRe
     const snapshot = await getDocs(query(collection(firestore, "reservationIntents"), orderBy("updatedAt", "desc")));
     return snapshot.docs.map((item) => {
       const data = item.data();
-      return { reservationId: item.id, status: data.status, updatedAt: data.updatedAt?.toDate?.() ?? new Date(), updatedBy: data.updatedBy };
+      return { reservationId: item.id, name: data.name ?? "", email: data.email ?? "", phone: data.phone ?? "", date: data.date ?? "", notes: data.notes ?? "", status: data.status, updatedAt: data.updatedAt?.toDate?.() ?? new Date(), updatedBy: data.updatedBy };
     });
   }
 
