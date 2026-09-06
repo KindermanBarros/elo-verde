@@ -10,7 +10,7 @@ export default function Home() {
     <main className="min-h-screen bg-stone-950 text-stone-100">
       <section className="relative isolate overflow-hidden">
         <div aria-hidden="true" className="absolute inset-0 -z-20 bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImage.src})` }} />
-        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(105deg,rgba(2,44,34,0.96)_0%,rgba(4,78,59,0.82)_38%,rgba(2,44,34,0.52)_72%,rgba(0,0,0,0.42)_100%)]" />
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(2,44,34,0.96)_0%,rgba(4,78,59,0.78)_38%,rgba(2,44,34,0.52)_72%,rgba(0,0,0,0.42)_100%)]" />
         <div className="mx-auto grid min-h-[48vh] max-w-6xl content-center gap-8 px-6 py-20 md:grid-cols-[1.35fr_0.65fr] md:px-10">
           <div className="hero-copy max-w-3xl">
             <p className="mb-4 text-sm font-semibold tracking-[0.22em] text-emerald-200 uppercase">Chácara Elo Verde</p>
