@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDocs, orderBy, query, serverTimestamp, setDoc } from "firebase/firestore";
+import { collection, doc, getDocs, orderBy, query, runTransaction, serverTimestamp } from "firebase/firestore";
 import type { ReservationIntentRepository } from "@/domain/reservation/ReservationIntentRepository";
 import type { ReservationIntent } from "@/domain/reservation/ReservationIntent";
 import type { ReservationStatus } from "@/domain/reservation/ReservationStatus";
@@ -13,10 +13,40 @@ export class FirestoreReservationIntentRepository implements ReservationIntentRe
   }
 
   async updateStatus(id: string, status: ReservationStatus, updatedBy: string) {
-    await setDoc(doc(firestore, "reservationIntents", id), { status, updatedBy, updatedAt: serverTimestamp() }, { merge: true });
+    const reservationRef = doc(firestore, "reservationIntents", id);
+    await runTransaction(firestore, async (transaction) => {
+      const reservation = await transaction.get(reservationRef);
+      if (!reservation.exists()) throw new Error("Reserva não encontrada.");
+      const data = reservation.data();
+      const date = String(data.date ?? "");
+      const currentStatus = data.status as ReservationStatus;
+      const lockRef = doc(firestore, "reservationDateLocks", date);
+      const lock = await transaction.get(lockRef);
+      const blocksDate = status === "Reservado" || status === "Quitado";
+      const currentlyBlocksDate = currentStatus === "Reservado" || currentStatus === "Quitado";
+
+      if (blocksDate) {
+        if (lock.exists() && lock.data().reservationId !== id) {
+          throw new Error("Esta data já está reservada ou quitada.");
+        }
+        transaction.set(lockRef, { reservationId: id, date, status, updatedBy, updatedAt: serverTimestamp() });
+      } else if (currentlyBlocksDate && lock.data()?.reservationId === id) {
+        transaction.delete(lockRef);
+      }
+      transaction.update(reservationRef, { status, updatedBy, updatedAt: serverTimestamp() });
+    });
   }
 
   async remove(id: string) {
-    await deleteDoc(doc(firestore, "reservationIntents", id));
+    const reservationRef = doc(firestore, "reservationIntents", id);
+    await runTransaction(firestore, async (transaction) => {
+      const reservation = await transaction.get(reservationRef);
+      if (!reservation.exists()) return;
+      const date = String(reservation.data().date ?? "");
+      const lockRef = doc(firestore, "reservationDateLocks", date);
+      const lock = await transaction.get(lockRef);
+      if (lock.data()?.reservationId === id) transaction.delete(lockRef);
+      transaction.delete(reservationRef);
+    });
   }
 }

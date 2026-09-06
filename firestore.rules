@@ -27,6 +27,19 @@ service cloud.firestore {
       ];
     }
 
+    function blocksDate(data) {
+      return data.status in ['Reservado', 'Quitado'];
+    }
+
+    function lockPath(date) {
+      return /databases/$(database)/documents/reservationDateLocks/$(date);
+    }
+
+    function hasMatchingLock(bookingId) {
+      return existsAfter(lockPath(request.resource.data.date))
+        && getAfter(lockPath(request.resource.data.date)).data.reservationId == bookingId;
+    }
+
     match /reservationIntents/{bookingId} {
       // Public visitors can only create pending contact requests.
       allow create: if hasValidReservationFields()
@@ -38,7 +51,8 @@ service cloud.firestore {
       allow create: if hasValidReservationFields()
         && hasValidStatus()
         && isStaff()
-        && request.resource.data.updatedBy == request.auth.token.email;
+        && request.resource.data.updatedBy == request.auth.token.email
+        && (!blocksDate(request.resource.data) || hasMatchingLock(bookingId));
 
       allow read: if isStaff();
       allow update: if isStaff()
@@ -47,6 +61,26 @@ service cloud.firestore {
         ])
         && hasValidStatus()
         && request.resource.data.updatedBy is string
+        && request.resource.data.updatedAt is timestamp
+        && (
+          (blocksDate(request.resource.data) && hasMatchingLock(bookingId))
+          || (!blocksDate(request.resource.data)
+            && (!blocksDate(resource.data) || !existsAfter(lockPath(resource.data.date))))
+        );
+      allow delete: if isStaff()
+        && (!blocksDate(resource.data) || !existsAfter(lockPath(resource.data.date)));
+    }
+
+    match /reservationDateLocks/{date} {
+      allow read: if isStaff();
+      allow create, update: if isStaff()
+        && request.resource.data.keys().hasOnly([
+          'reservationId', 'date', 'status', 'updatedBy', 'updatedAt'
+        ])
+        && request.resource.data.date == date
+        && request.resource.data.reservationId is string
+        && request.resource.data.status in ['Reservado', 'Quitado']
+        && request.resource.data.updatedBy == request.auth.token.email
         && request.resource.data.updatedAt is timestamp;
       allow delete: if isStaff();
     }
