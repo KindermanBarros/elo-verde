@@ -34,7 +34,7 @@ service cloud.firestore {
         ]
         && request.resource.data.updatedBy is string
         && request.resource.data.updatedAt is timestamp;
-      allow delete: if false;
+      allow delete: if isStaff();
     }
   }
 }
