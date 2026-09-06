@@ -1,6 +1,6 @@
 # Chácara Elo Verde
 
-Agenda e painel administrativo da Chácara Elo Verde.
+Reservas de diárias e painel administrativo da Chácara Elo Verde.
 
 ## Configuração
 
