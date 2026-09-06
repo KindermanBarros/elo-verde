@@ -7,9 +7,8 @@ service cloud.firestore {
         && request.auth.token.email == 'eloverdemanaus@gmail.com';
     }
 
-    match /reservationIntents/{bookingId} {
-      // Visitors may submit a new request, but cannot read or alter requests.
-      allow create: if request.resource.data.keys().hasOnly([
+    function hasValidReservationFields() {
+      return request.resource.data.keys().hasOnly([
         'name', 'email', 'phone', 'date', 'notes',
         'status', 'updatedBy', 'createdAt', 'updatedAt'
       ])
@@ -19,9 +18,21 @@ service cloud.firestore {
         && request.resource.data.date is string
         && request.resource.data.notes is string
         && request.resource.data.status == 'Pendente contato'
-        && request.resource.data.updatedBy == 'site'
         && request.resource.data.createdAt is timestamp
         && request.resource.data.updatedAt is timestamp;
+    }
+
+    match /reservationIntents/{bookingId} {
+      // The public site may create requests identified as "site".
+      // The authenticated administrative account may create requests in the app.
+      allow create: if hasValidReservationFields()
+        && (
+          (request.auth == null && request.resource.data.updatedBy == 'site')
+          || (
+            isStaff()
+            && request.resource.data.updatedBy == request.auth.token.email
+          )
+        );
 
       // Only authenticated staff can review and update reservation status.
       allow read: if isStaff();
