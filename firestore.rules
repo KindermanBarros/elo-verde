@@ -17,32 +17,35 @@ service cloud.firestore {
         && request.resource.data.phone is string
         && request.resource.data.date is string
         && request.resource.data.notes is string
-        && request.resource.data.status == 'Pendente contato'
         && request.resource.data.createdAt is timestamp
         && request.resource.data.updatedAt is timestamp;
     }
 
-    match /reservationIntents/{bookingId} {
-      // The public site may create requests identified as "site".
-      // The authenticated administrative account may create requests in the app.
-      allow create: if hasValidReservationFields()
-        && (
-          (request.auth == null && request.resource.data.updatedBy == 'site')
-          || (
-            isStaff()
-            && request.resource.data.updatedBy == request.auth.token.email
-          )
-        );
+    function hasValidStatus() {
+      return request.resource.data.status in [
+        'Pendente contato', 'Reservado', 'Quitado', 'Visita'
+      ];
+    }
 
-      // Only authenticated staff can review and update reservation status.
+    match /reservationIntents/{bookingId} {
+      // Public visitors can only create pending contact requests.
+      allow create: if hasValidReservationFields()
+        && request.auth == null
+        && request.resource.data.status == 'Pendente contato'
+        && request.resource.data.updatedBy == 'site';
+
+      // Staff can create any valid status, including multiple visits per date.
+      allow create: if hasValidReservationFields()
+        && hasValidStatus()
+        && isStaff()
+        && request.resource.data.updatedBy == request.auth.token.email;
+
       allow read: if isStaff();
       allow update: if isStaff()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'status', 'updatedBy', 'updatedAt'
         ])
-        && request.resource.data.status in [
-          'Pendente contato', 'Reservado', 'Quitado', 'Visita'
-        ]
+        && hasValidStatus()
         && request.resource.data.updatedBy is string
         && request.resource.data.updatedAt is timestamp;
       allow delete: if isStaff();
